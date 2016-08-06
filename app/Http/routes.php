@@ -11,17 +11,18 @@
 |
 */
 
-Route::auth();
+
 /////////////////////////this group for guests //////////////////////////////
-Route::group(['prefix' => \UriLocalizer::localeFromRequest()], function(){
+Route::group(['middleware'=>'localizer','prefix' => \UriLocalizer::localeFromRequest()], function(){
+  Route::auth();
   Route::get('/', function () {
       return view('welcome');
-  });
+  });  
 });
 /////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////this group for users (with some permissions)///////////////////////////////////////////
-Route::group(['prefix' => \UriLocalizer::localeFromRequest(),'middleware' => 'auth'], function() {
+Route::group(['prefix' => \UriLocalizer::localeFromRequest(),'middleware' => ['auth','localizer']], function() {
 
 	Route::get('/home', 'HomeController@index');
 	Route::get('users',['as'=>'users.index','uses'=>'UserController@index','middleware' => ['permission:user-list|user-create|user-edit|user-delete']]);
