@@ -10,13 +10,18 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::auth();
+/////////////////////////this group for guests //////////////////////////////
+Route::group(['prefix' => \UriLocalizer::localeFromRequest()], function(){
+  Route::get('/', function () {
+      return view('welcome');
+  });
+});
+/////////////////////////////////////////////////////////////////////////////
 
-Route::group(['middleware' => ['auth']], function() {
+//////////////////////////////////this group for users (with some permissions)///////////////////////////////////////////
+Route::group(['prefix' => \UriLocalizer::localeFromRequest(),'middleware' => 'auth'], function() {
 
 	Route::get('/home', 'HomeController@index');
 	Route::get('users',['as'=>'users.index','uses'=>'UserController@index','middleware' => ['permission:user-list|user-create|user-edit|user-delete']]);
@@ -34,5 +39,3 @@ Route::group(['middleware' => ['auth']], function() {
 	Route::patch('roles/{id}',['as'=>'roles.update','uses'=>'RoleController@update','middleware' => ['permission:role-edit']]);
 	Route::delete('roles/{id}',['as'=>'roles.destroy','uses'=>'RoleController@destroy','middleware' => ['permission:role-delete']]);
 });
-
-
